@@ -12,7 +12,9 @@
     
     <!-- Data URI Manifest to guarantee standalone behavior -->
     <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22LumaTrack%22%2C%22short_name%22%3A%22LumaTrack%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2309090b%22%2C%22theme_color%22%3A%22%2309090b%22%7D">
-    <link rel="apple-touch-icon" href="https://via.placeholder.com/180/fbbf24/09090b?text=LT">
+    
+    <!-- Custom App Icon from GitHub -->
+    <link rel="apple-touch-icon" href="Screenshot%202026-08-09%20090609.png">
 
     <title>LumaTrack | Premium Wellness</title>
     <style>
@@ -343,7 +345,10 @@
     <!-- MAIN APP SHELL -->
     <div id="app-shell">
         <nav class="nav-menu glass">
-            <div class="nav-brand text-gradient">LumaTrack</div>
+            <div class="nav-brand" style="display: flex; align-items: center; gap: 10px;">
+                <img src="Screenshot%202026-08-09%20090609.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;">
+                <span class="text-gradient">LumaTrack</span>
+            </div>
             <a onclick="nav('dashboard')" id="nav-dashboard" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><span>Dashboard</span></a>
             <a onclick="nav('checkin')" id="nav-checkin" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg><span>Check-In</span></a>
             <a onclick="nav('goals')" id="nav-goals" class="nav-item"><svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg><span>Goals</span></a>
