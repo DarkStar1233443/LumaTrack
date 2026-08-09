@@ -206,17 +206,31 @@
         .goal-card { background: rgba(128,128,128,0.1); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 15px; position: relative; transition: 0.3s; }
         .goal-card.active-goal { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); background: rgba(128,128,128,0.15); }
 
+        /* ADMIN TABLE STYLING */
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--glass-border); }
+        .admin-table th { color: var(--accent); font-weight: 700; }
+        .admin-table tr:hover { background: rgba(128,128,128,0.05); }
+
+        /* PHOTO GALLERY STYLING */
+        .photo-gallery { display: flex; gap: 15px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 15px; -webkit-overflow-scrolling: touch; }
+        .photo-gallery::-webkit-scrollbar { height: 6px; }
+        .photo-gallery::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+        .photo-card { flex: 0 0 85%; max-width: 350px; scroll-snap-align: center; background: rgba(128,128,128,0.1); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); }
+        .photo-card img { width: 100%; height: 350px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
         @media (min-width: 769px) {
             #app-shell { flex-direction: row; }
             .nav-menu { width: 280px; height: 100vh; flex-direction: column; padding: 40px 24px; border-right: 1px solid var(--glass-border); background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); }
             .nav-brand { font-size: 2.2rem; font-weight: 800; margin-bottom: 50px; padding-left: 10px; }
             .scroll-container { margin-left: 280px; }
+            .photo-card { flex: 0 0 40%; }
         }
         
         /* IPHONE / MOBILE PERFECT GRID & HORIZONTAL SCROLL NAV */
         @media (max-width: 768px) {
             .nav-menu { 
-                bottom: 25px; left: 15px; right: 15px; /* Lifted slightly for iOS home bar */
+                bottom: 25px; left: 15px; right: 15px; 
                 flex-direction: row; 
                 justify-content: flex-start;
                 flex-wrap: nowrap;
@@ -247,7 +261,6 @@
             .nav-item.active { background: transparent; color: var(--accent); box-shadow: none; }
             .nav-item.active svg { transform: scale(1.2); filter: drop-shadow(0 0 10px var(--accent-glow)); }
             
-            /* Safe area padding for top notch */
             .main-content { padding: calc(env(safe-area-inset-top, 20px) + 20px) 15px 180px 15px !important; } 
             
             .glass-card { padding: 18px; border-radius: 22px; width: 100%; box-sizing: border-box; }
@@ -259,7 +272,7 @@
             h3 { font-size: 1rem; }
             
             #view-dashboard .grid-3 { grid-template-columns: 1fr; gap: 15px; }
-            #view-settings .grid-2, #view-checkin .grid-2 { grid-template-columns: 1fr; gap: 15px; }
+            #view-settings .grid-2, #view-checkin .grid-2, #view-photos .grid-2 { grid-template-columns: 1fr; gap: 15px; }
 
             .scale-wrapper { max-width: 100%; padding: 0 5px; }
             .scale-text { font-size: 2.5rem; }
@@ -346,16 +359,20 @@
     <div id="app-shell">
         <nav class="nav-menu glass">
             <div class="nav-brand" style="display: flex; align-items: center; gap: 10px;">
-                <!-- Updated Image Source Here -->
                 <img src="769175393_28482904897980363_5172773195014769991_n.jpg" alt="Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;">
                 <span class="text-gradient">LumaTrack</span>
             </div>
             <a onclick="nav('dashboard')" id="nav-dashboard" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><span>Dashboard</span></a>
             <a onclick="nav('checkin')" id="nav-checkin" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg><span>Check-In</span></a>
+            <!-- NEW PHOTOS TAB -->
+            <a onclick="nav('photos')" id="nav-photos" class="nav-item"><svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/></svg><span>Photos</span></a>
+            
             <a onclick="nav('goals')" id="nav-goals" class="nav-item"><svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg><span>Goals</span></a>
             <a onclick="nav('progress')" id="nav-progress" class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/></svg><span>Analytics</span></a>
             <a onclick="nav('calendar')" id="nav-calendar" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span>Calendar</span></a>
             <a onclick="nav('settings')" id="nav-settings" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 C9.57,21.83,9.77,22,10.01,22h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>Settings</span></a>
+            <!-- HIDDEN ADMIN NAV BUTTON -->
+            <a onclick="nav('admin')" id="nav-admin" class="nav-item" style="display:none;"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg><span>Admin</span></a>
         </nav>
 
         <div class="scroll-container" id="scroll-area">
@@ -465,6 +482,45 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: PROGRESS PHOTOS (NEW FEATURE) -->
+                <section id="view-photos" class="view">
+                    <header style="margin-bottom: 30px;">
+                        <h1 class="text-gradient">Progress Photos</h1>
+                        <p>Visually track your transformation over time.</p>
+                    </header>
+                    
+                    <!-- Upload Area -->
+                    <div class="glass glass-card" style="margin-bottom:24px;">
+                        <h3 style="margin-bottom: 15px;">Add New Photo</h3>
+                        <div class="grid grid-2">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Date</label>
+                                <input type="date" id="photo-date" style="font-size:1.1rem; font-weight:700;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Upload Image</label>
+                                <input type="file" id="photo-file" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                                <button class="btn btn-glass" style="width:100%; border: 1px dashed var(--accent); color: var(--accent); padding: 16px;" onclick="document.getElementById('photo-file').click()">📷 Tap to Camera / Gallery</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Auto-compressed Image Preview -->
+                        <div id="photo-preview-container" style="display:none; margin-top: 15px; text-align: center;">
+                            <img id="photo-preview" src="" alt="Preview" style="max-height: 250px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); object-fit: contain; width: 100%;">
+                            <p style="font-size:0.75rem; color:var(--success); margin-top:8px;">✓ Image auto-compressed for storage</p>
+                        </div>
+
+                        <div class="form-group" style="margin-top:20px;"><label>Progress Notes</label><textarea id="photo-notes" rows="2" placeholder="Looking leaner! Feeling great..."></textarea></div>
+                        <button class="btn btn-primary" id="btn-save-photo" style="font-size:1.1rem; padding:16px;" onclick="savePhotoEntry()">Save Progress Photo</button>
+                    </div>
+
+                    <!-- Horizontal Scrolling Gallery -->
+                    <h3 style="margin-bottom: 15px;">Your Gallery <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted); margin-left: 10px;">(Scroll right to compare)</span></h3>
+                    <div id="photo-gallery" class="photo-gallery">
+                        <!-- Populated by JS -->
                     </div>
                 </section>
 
@@ -627,24 +683,112 @@
                             </div>
                         </div>
 
-                        <!-- DATA SYNC -->
+                        <!-- DATA SYNC & FIREBASE 4-DIGIT BACKUP -->
                         <div class="glass glass-card" style="grid-column: 1 / -1;">
-                            <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></div><h3>Data Backup & Sync</h3></div>
-                            <div class="grid grid-2" style="margin-top:15px;">
-                                <button class="btn btn-glass" onclick="exportSync()">📋 Copy Backup Code</button>
-                                <button class="btn btn-primary" onclick="importSync()">📥 Import Code</button>
+                            <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></div><h3>Firebase Cloud Sync (4-Digit PIN)</h3></div>
+                            
+                            <div style="background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 16px; margin-top:15px; text-align:center;">
+                                <h3 style="margin-bottom:10px;">Cross-Device Cloud Sync</h3>
+                                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Generate a 4-digit PIN to load your data on another device securely.</p>
+                                
+                                <div id="sync-code-display" style="font-size: 2.5rem; letter-spacing: 10px; font-weight: 800; color: var(--accent); margin-bottom: 15px; display:none;">
+                                    ----
+                                </div>
+                                
+                                <div class="grid grid-2" style="gap:10px;">
+                                    <button class="btn btn-primary" onclick="generateFirebasePin()">Generate Code</button>
+                                    <button class="btn btn-glass" onclick="enterFirebasePin()">Enter Code</button>
+                                </div>
                             </div>
-                            <button class="btn btn-glass" style="border-color:var(--danger); color:var(--danger); margin-top:20px;" onclick="resetData()">Delete All Data Permanently</button>
+
+                            <!-- Offline Fallback -->
+                            <div style="margin-top: 25px; border-top: 1px dashed var(--glass-border); padding-top:20px;">
+                                <h3 style="font-size:0.95rem; color:var(--text-muted); margin-bottom:10px;">Manual Offline Backup</h3>
+                                <div class="grid grid-2" style="gap:10px;">
+                                    <button class="btn btn-glass" onclick="exportSync()">📋 Copy Backup Code</button>
+                                    <button class="btn btn-glass" onclick="importSync()">📥 Import Code</button>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-glass" style="border-color:var(--danger); color:var(--danger); margin-top:30px;" onclick="resetData()">Delete All Data Permanently</button>
                         </div>
+                        
+                        <!-- ADMIN GATEWAY -->
+                        <div class="glass glass-card" style="grid-column: 1 / -1; margin-top:10px;">
+                            <div class="card-header"><div class="card-icon" style="color:#fbbf24;"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg></div><h3 style="color:#fbbf24;">Admin Gateway</h3></div>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Enter security PIN (2207) to unlock master admin panel.</p>
+                            <div style="display:flex; gap:10px;">
+                                <input type="password" id="admin-secret" placeholder="PIN" style="letter-spacing:5px; text-align:center; font-weight:bold;">
+                                <button class="btn btn-glass" style="width:auto; padding:10px 20px; background:#fbbf24; color:#000;" onclick="checkAdmin()">Unlock</button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </section>
+                
+                <!-- VIEW: ADMIN PANEL -->
+                <section id="view-admin" class="view">
+                    <header style="margin-bottom: 30px;">
+                        <h1 style="color:#fbbf24; background:none; -webkit-text-fill-color:unset;">Master Admin Panel</h1>
+                        <p style="color:var(--text-muted);">Manage all cloud user accounts via Firebase.</p>
+                    </header>
+                    
+                    <div class="grid grid-3" style="margin-bottom:24px;">
+                        <div class="glass glass-card" style="padding:15px; border-color:#fbbf24;">
+                            <p style="font-size:0.8rem; color:var(--text-muted); font-weight:bold; text-transform:uppercase;">Cloud Accounts</p>
+                            <div class="stat-val" id="admin-count" style="color:#fbbf24;">Loading...</div>
+                        </div>
+                        <div class="glass glass-card" style="padding:15px; border-color:#fbbf24;">
+                            <p style="font-size:0.8rem; color:var(--text-muted); font-weight:bold; text-transform:uppercase;">System Status</p>
+                            <div class="stat-val" style="color:#10b981; font-size:1.5rem;">Connected</div>
+                        </div>
+                    </div>
+
+                    <div class="glass glass-card" style="overflow-x:auto;">
+                        <h3 style="margin-bottom:15px; color:#fbbf24;">Live Cloud Users</h3>
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>User Nickname</th>
+                                    <th>Latest Weight</th>
+                                    <th>PIN Code</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-user-list">
+                                <!-- Populated dynamically from Firebase -->
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </main>
         </div>
     </div>
 
+    <!-- FIREBASE SDK SCRIPTS -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <!-- SCRIPT LOGIC -->
     <script>
-        // --- 1. PREMIUM THEMES (WITH THE NEW "LUMA PREMIUM ✨" SIGNATURE THEME) ---
+        // --- FIREBASE CLOUD CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQH8ml3T6cH0gOnXM7s8qofFBSV7vTyC8",
+            authDomain: "darkstar-a0749.firebaseapp.com",
+            projectId: "darkstar-a0749",
+            storageBucket: "darkstar-a0749.firebasestorage.app",
+            messagingSenderId: "203187008039",
+            appId: "1:203187008039:web:baa630c6274cc92d629402",
+            measurementId: "G-4WNEHQVZ47"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const fdb = firebase.firestore();
+
+        // --- 1. PREMIUM THEMES ---
         const THEMES = {
             signature: { name: 'Luma Premium ✨', mode: 'dark', bg1: '#09090b', bg2: '#18181b', bg3: '#27272a', accent: '#fbbf24' },
             midnight: { name: 'Midnight', mode: 'dark', bg1: '#0f172a', bg2: '#1e1b4b', bg3: '#312e81', accent: '#38bdf8' },
@@ -655,25 +799,30 @@
             obsidian: { name: 'Obsidian', mode: 'dark', bg1: '#000000', bg2: '#0a0a0a', bg3: '#171717', accent: '#a3a3a3' }
         };
 
-        // --- 2. DB INITIALIZATION (v10) ---
+        // --- 2. DB INITIALIZATION ---
         const DB_KEY = 'lumaTrackData_v10';
         let db;
         try { db = JSON.parse(localStorage.getItem(DB_KEY)); } catch(e){}
         
         if (!db) {
-            let oldDb = JSON.parse(localStorage.getItem('lumaTrackData_v9')) || JSON.parse(localStorage.getItem('lumaTrackData_v8')) || JSON.parse(localStorage.getItem('lumaTrackData_v7'));
-            if(oldDb) { db = oldDb; } else { db = { profile: null, settings: {}, entries: {}, goals: [] }; }
+            let oldDb = JSON.parse(localStorage.getItem('lumaTrackData_v9')) || JSON.parse(localStorage.getItem('lumaTrackData_v8'));
+            if(oldDb) { db = oldDb; } else { db = { profile: null, settings: {}, entries: {}, goals: [], photos: {} }; }
         }
         
         if (!db.settings.unit) db.settings.unit = 'metric';
         if (!db.settings.appearance) db.settings.appearance = { theme: 'signature', bgStyle: 'mesh', font: "'Inter', sans-serif" };
         if (!db.goals) db.goals = [];
+        if (!db.photos) db.photos = {}; // Initialize photos object
 
         document.addEventListener('DOMContentLoaded', () => {
             initStudio(); applyTheme(); startLiveClock();
             if (!db.profile) { document.getElementById('view-onboarding').style.display = 'flex'; } 
             else { startApp(); }
             document.getElementById('in-weight').addEventListener('input', (e) => animScale(e.target.value));
+            
+            // Set today's date for photo tab by default
+            let d = new Date();
+            document.getElementById('photo-date').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         });
 
         window.addEventListener('resize', () => {
@@ -683,7 +832,6 @@
 
         function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 
-        // Fullscreen Mode Toggle for the Dashboard Button
         function toggleFullScreen() {
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 let docElm = document.documentElement;
@@ -734,7 +882,7 @@
         function selectTheme(key) {
             db.settings.appearance.theme = key; saveDB(); applyTheme();
             document.querySelectorAll('.theme-card').forEach(el => { el.classList.remove('active'); if (el.textContent === THEMES[key].name) el.classList.add('active'); });
-            renderHTMLCharts(); renderTrendSparkline(); // Redraw charts with new accent colors
+            renderHTMLCharts(); renderTrendSparkline();
         }
         function updateApp(key, val) { db.settings.appearance[key] = val; saveDB(); applyTheme(); }
 
@@ -786,6 +934,7 @@
             if (viewId === 'progress') setTimeout(() => renderHTMLCharts(), 50);
             if (viewId === 'calendar') renderCal();
             if (viewId === 'goals') renderGoalsView();
+            if (viewId === 'photos') renderPhotosGallery();
             if (viewId === 'checkin') {
                 if(!document.getElementById('in-date').value) {
                     let d = new Date();
@@ -793,6 +942,7 @@
                 }
                 loadHistoricalData();
             }
+            if (viewId === 'admin') renderAdminPanel();
         }
 
         function loadHistoricalData() {
@@ -832,6 +982,109 @@
                 else { curr += diff * 0.15; disp.textContent = curr.toFixed(1); scaleAnimId = requestAnimationFrame(step); }
             }
             scaleAnimId = requestAnimationFrame(step);
+        }
+
+        // --- NEW: PROGRESS PHOTOS LOGIC WITH AUTO COMPRESSION ---
+        let currentPhotoBase64 = null;
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Using Canvas to compress image automatically so it doesn't crash LocalStorage/Firebase
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600; // Cap width to keep size small
+                    const scaleSize = MAX_WIDTH / img.width;
+                    
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Compress to JPEG 70% quality
+                    currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    const preview = document.getElementById('photo-preview');
+                    preview.src = currentPhotoBase64;
+                    document.getElementById('photo-preview-container').style.display = 'block';
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function savePhotoEntry() {
+            const dStr = document.getElementById('photo-date').value;
+            const notes = document.getElementById('photo-notes').value.trim();
+            
+            if(!dStr) return alert("Please select a date.");
+            if(!currentPhotoBase64) return alert("Please upload or take a photo first.");
+
+            // Save to DB
+            db.photos[dStr] = {
+                image: currentPhotoBase64,
+                notes: notes
+            };
+            saveDB();
+
+            const btn = document.getElementById('btn-save-photo');
+            const oldTxt = btn.textContent;
+            btn.textContent = '✓ Photo Saved!';
+            btn.style.background = 'var(--success)';
+            
+            setTimeout(() => { 
+                btn.textContent = oldTxt; 
+                btn.style.background = ''; 
+                // Reset form
+                document.getElementById('photo-preview-container').style.display = 'none';
+                currentPhotoBase64 = null;
+                document.getElementById('photo-notes').value = '';
+                
+                renderPhotosGallery();
+            }, 1000);
+        }
+
+        function renderPhotosGallery() {
+            const gallery = document.getElementById('photo-gallery');
+            gallery.innerHTML = '';
+            
+            const dates = Object.keys(db.photos).sort((a,b) => new Date(b) - new Date(a)); // Newest first
+
+            if(dates.length === 0) {
+                gallery.innerHTML = `<p style="padding: 20px; color: var(--text-muted);">No photos saved yet. Upload your first progress picture above!</p>`;
+                return;
+            }
+
+            dates.forEach(dStr => {
+                const p = db.photos[dStr];
+                // Try to find corresponding weight for that date
+                const weight = db.entries[dStr] && db.entries[dStr].weight ? `${db.entries[dStr].weight} ${db.settings.unit === 'imperial' ? 'lb' : 'kg'}` : '--';
+                
+                gallery.innerHTML += `
+                    <div class="photo-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <h3 style="margin:0; font-size:1.1rem; color:var(--accent);">${dStr}</h3>
+                            <span class="badge-glass">⚖️ ${weight}</span>
+                        </div>
+                        <img src="${p.image}" alt="Progress Photo">
+                        ${p.notes ? `<p style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; font-size: 0.85rem;">${p.notes}</p>` : ''}
+                        <button class="btn btn-glass" style="margin-top:10px; padding:6px 12px; font-size:0.8rem; border-color:var(--danger); color:var(--danger); width:auto;" onclick="deletePhoto('${dStr}')">Delete</button>
+                    </div>
+                `;
+            });
+        }
+
+        function deletePhoto(dStr) {
+            if(confirm("Are you sure you want to delete this photo?")) {
+                delete db.photos[dStr];
+                saveDB();
+                renderPhotosGallery();
+            }
         }
 
         // --- 6. DASHBOARD & BMI ---
@@ -880,7 +1133,6 @@
             document.getElementById('ring-mood').style.setProperty('--progress', recentMood ? `${(recentMood/10)*100}%` : '0%');
             document.getElementById('val-mood').textContent = recentMood ? `${recentMood}/10` : '-';
 
-            // Active Goal Widget
             const activeGoal = db.goals.find(g => g.active);
             const goalWidget = document.getElementById('widget-goal');
             if(activeGoal && lw !== '--') {
@@ -907,7 +1159,6 @@
                 } else document.getElementById('goal-time-left').textContent = `No target date set`;
             } else goalWidget.style.display = 'none';
 
-            // BMI Fix
             const bmiDisp = document.getElementById('bmi-display');
             const h = parseFloat(db.profile.height), w = parseFloat(lw);
             if(h && w && lw !== '--') {
@@ -929,7 +1180,7 @@
             setTimeout(() => renderTrendSparkline(), 50);
         }
 
-        // --- 7. SPARKLINE TREND GRAPH ON DASHBOARD (Fixed to visually drop on weight loss) ---
+        // --- 7. SPARKLINE TREND GRAPH ---
         function renderTrendSparkline() {
             const container = document.getElementById('dash-sparkline-svg');
             const textEl = document.getElementById('dash-trend-text');
@@ -950,17 +1201,15 @@
             let isGain = diff > 0;
             let isNeutral = diff === 0;
 
-            // Gain = Red Arrow UP, Loss = Green Arrow DOWN
             let color = isGain ? 'var(--danger)' : isNeutral ? 'var(--text-muted)' : 'var(--success)';
             let icon = isGain ? '▲' : isNeutral ? '—' : '▼';
             let u = db.settings.unit === 'imperial' ? 'lb' : 'kg';
 
             textEl.innerHTML = `<span style="color:${color}; font-size:1.6rem; font-weight:800; line-height:1;">${icon} ${Math.abs(diff).toFixed(1)} ${u}</span> <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">Overall ${isGain ? 'increase' : isNeutral ? 'no change' : 'decrease'} (Last ${wPts.length} points)</span>`;
 
-            // SVG Logic (Math fixed so lower weight clearly maps to bottom of the SVG bounding box)
             let min = Math.min(...wPts), max = Math.max(...wPts);
             if(min === max) { min -= 2; max += 2; }
-            let pad = (max - min) * 0.3; // Added extra padding so the drop is very visible
+            let pad = (max - min) * 0.3;
             min -= pad; max += pad;
             
             let h = container.clientHeight || 80, w = container.clientWidth || 250;
@@ -969,8 +1218,6 @@
             let dPath = '';
             wPts.forEach((v, i) => {
                 let x = i * xStep;
-                // High weight = top of graph (y close to 0)
-                // Low weight = bottom of graph (y close to h)
                 let y = h - ((v - min)/(max - min)*h); 
                 
                 if(i===0) dPath += `M ${x},${y} `;
@@ -1303,7 +1550,51 @@
             updateUnitsUI(); det.style.display = 'block';
         }
 
-        // --- 12. BACKUP / SYNC ---
+        // --- 12. FIREBASE CLOUD SYNC & ADMIN PANEL ---
+        async function generateFirebasePin() {
+            const pin = Math.floor(1000 + Math.random() * 9000).toString();
+            const btn = event.target;
+            btn.textContent = "Uploading to Cloud...";
+
+            try {
+                await fdb.collection("users").doc(pin).set({
+                    pin: pin,
+                    name: db.profile ? db.profile.name : "Anonymous",
+                    appData: db,
+                    updatedAt: new Date().toISOString()
+                });
+
+                const disp = document.getElementById('sync-code-display');
+                disp.textContent = pin;
+                disp.style.display = 'block';
+                btn.textContent = "Generate Code";
+                alert(`Success! Your 4-Digit Cloud PIN is: ${pin}\nEnter this number on your other device to sync.`);
+            } catch(e) {
+                alert("Firebase Error: Make sure your database is set to Test Mode.");
+                btn.textContent = "Generate Code";
+            }
+        }
+
+        async function enterFirebasePin() {
+            const pin = prompt("Enter the 4-Digit Cloud PIN:");
+            if(!pin) return;
+
+            try {
+                const docRef = await fdb.collection("users").doc(pin).get();
+                if(docRef.exists) {
+                    const data = docRef.data();
+                    db = data.appData;
+                    saveDB();
+                    alert("Cloud Sync Successful! Reloading app...");
+                    location.reload();
+                } else {
+                    alert("PIN not found in Firebase database.");
+                }
+            } catch(e) {
+                alert("Connection error. Check your Firebase settings.");
+            }
+        }
+
         function exportSync() {
             const str = btoa(encodeURIComponent(JSON.stringify(db)));
             if(navigator.clipboard) { navigator.clipboard.writeText(str); alert('Backup code copied!'); }
@@ -1318,6 +1609,76 @@
         }
         function resetData() {
             if(confirm('WARNING: Delete ALL data permanently?')) { localStorage.clear(); location.reload(); }
+        }
+
+        // ADMIN PANEL LOGIC (PIN: 2207)
+        function checkAdmin() {
+            const pin = document.getElementById('admin-secret').value;
+            if(pin === '2207') {
+                document.getElementById('nav-admin').style.display = 'flex';
+                document.getElementById('admin-secret').value = '';
+                nav('admin');
+            } else {
+                alert("Incorrect Admin PIN.");
+            }
+        }
+
+        async function renderAdminPanel() {
+            const list = document.getElementById('admin-user-list');
+            const countEl = document.getElementById('admin-count');
+            list.innerHTML = `<tr><td colspan="4" style="text-align:center;">Loading cloud users...</td></tr>`;
+
+            try {
+                const snapshot = await fdb.collection("users").get();
+                countEl.textContent = snapshot.size;
+                
+                if(snapshot.empty) {
+                    list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No cloud accounts found yet. Generate a PIN on a device first!</td></tr>`;
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    let latestWeight = "--";
+                    if(d.appData && d.appData.entries) {
+                        let keys = Object.keys(d.appData.entries).sort();
+                        for(let i=keys.length-1; i>=0; i--) {
+                            if(d.appData.entries[keys[i]].weight) {
+                                latestWeight = d.appData.entries[keys[i]].weight;
+                                break;
+                            }
+                        }
+                    }
+
+                    html += `
+                        <tr>
+                            <td style="font-weight:600; color:var(--text-main);">${d.name || 'User'}</td>
+                            <td>${latestWeight} ${db.settings.unit==='imperial'?'lb':'kg'}</td>
+                            <td><span style="background:var(--input-bg); padding:4px 8px; border-radius:8px; font-family:monospace; color:var(--accent);">${d.pin}</span></td>
+                            <td><button class="btn btn-glass" style="padding:6px 12px; font-size:0.8rem; width:auto;" onclick="loadUserAccount('${doc.id}')">Remote Login</button></td>
+                        </tr>
+                    `;
+                });
+                list.innerHTML = html;
+            } catch(e) {
+                list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--danger);">Failed to load cloud accounts. Make sure you enabled Firestore Database in test mode!</td></tr>`;
+            }
+        }
+
+        async function loadUserAccount(pin) {
+            if(!confirm(`Switch your local view to account PIN [${pin}]?`)) return;
+            try {
+                const docRef = await fdb.collection("users").doc(pin).get();
+                if(docRef.exists) {
+                    db = docRef.data().appData;
+                    saveDB();
+                    alert("Switched account successfully!");
+                    location.reload();
+                }
+            } catch(e) {
+                alert("Could not load user data.");
+            }
         }
     </script>
 </body>
