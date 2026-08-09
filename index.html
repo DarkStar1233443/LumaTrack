@@ -155,7 +155,7 @@
         .btn-icon-small:hover { background: var(--glass-border); transform: scale(1.05); color: #fff; }
 
         .grid { display: grid; gap: 24px; width: 100%; }
-        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
         .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
         .grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
         
@@ -219,6 +219,31 @@
         .photo-card { flex: 0 0 85%; max-width: 350px; scroll-snap-align: center; background: rgba(128,128,128,0.1); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); }
         .photo-card img { width: 100%; height: 350px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
+        /* DASHBOARD SMALL PHOTO GALLERY STYLING */
+        .dash-photo-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; margin-top: 15px; }
+        .dash-photo-scroll::-webkit-scrollbar { display: none; }
+        .dash-photo-card { flex: 0 0 130px; max-width: 130px; height: 160px; scroll-snap-align: start; border-radius: 14px; overflow: hidden; position: relative; border: 1px solid var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.3s; }
+        .dash-photo-card:hover { transform: scale(1.05); }
+        .dash-photo-card img { width: 100%; height: 100%; object-fit: cover; }
+        .dash-photo-date { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.75rem; padding: 6px; text-align: center; backdrop-filter: blur(4px); font-weight: 700; }
+
+        /* TOAST NOTIFICATION */
+        #toast-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 400px; }
+        .toast { background: var(--bg-1); color: var(--text-main); border: 1px solid var(--accent); border-left: 5px solid var(--accent); padding: 16px 24px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: 600; opacity: 0; animation: fadeToast 3s forwards; pointer-events: none; }
+        body[data-mode="light"] .toast { background: #fff; }
+        @keyframes fadeToast { 0% { opacity: 0; transform: translateY(20px); } 10% { opacity: 1; transform: translateY(0); } 90% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-20px); } }
+
+        /* ONBOARDING FIX FOR LAPTOPS */
+        #view-onboarding { position: fixed; inset: 0; z-index: 1000; display: none; background: var(--bg-1); padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        body[data-mode="light"] #view-onboarding { background: #f8fafc; }
+        .onboarding-card { max-width: 500px; width: 100%; text-align: center; margin: 40px auto; overflow: visible; padding-bottom: 30px; }
+
+        /* THEME CARD GRID (ADDED FIX) */
+        .theme-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-top: 15px; margin-bottom: 25px; }
+        .theme-card { padding: 15px 10px; border-radius: 12px; text-align: center; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .theme-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .theme-card.active { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); transform: scale(1.05); }
+
         @media (min-width: 769px) {
             #app-shell { flex-direction: row; }
             .nav-menu { width: 280px; height: 100vh; flex-direction: column; padding: 40px 24px; border-right: 1px solid var(--glass-border); background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); }
@@ -279,21 +304,13 @@
             .scale-body { padding: 20px; }
             .scale-screen { padding: 15px; }
         }
-
-        #view-onboarding { position: fixed; inset: 0; z-index: 1000; display: none; flex-direction: column; align-items: center; background: var(--bg-1); padding: 40px 20px; overflow-y: auto; }
-        body[data-mode="light"] #view-onboarding { background: #f8fafc; }
-        .onboarding-card { max-width: 500px; width: 100%; text-align: center; margin: auto; }
-
-        .theme-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin-top: 15px; }
-        .theme-card { height: 110px; border-radius: 20px; cursor: pointer; padding: 15px; display: flex; flex-direction: column; justify-content: flex-end; border: 2px solid transparent; transition: 0.3s; color: #fff; font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.5); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .theme-card:hover { transform: translateY(-5px); }
-        .theme-card.active { border-color: #fff; box-shadow: 0 0 0 4px var(--accent); }
     </style>
 </head>
 <body data-mode="dark">
 
     <div class="bg-layer" id="bg-mesh"></div>
     <div class="bg-layer" id="bg-aurora"></div>
+    <div id="toast-container"></div> <!-- Toast Notifications Container -->
 
     <!-- ONBOARDING -->
     <div id="view-onboarding">
@@ -323,7 +340,7 @@
         <div class="glass glass-card onboarding-card view" id="onboard-step-2" style="display: none;">
             <h2>Choose Your Vibe</h2>
             <p>You can change this anytime in Settings.</p>
-            <div class="theme-grid" id="onboard-theme-grid" style="margin: 30px 0;"></div>
+            <div class="theme-grid" id="onboard-theme-grid"></div>
             <button class="btn btn-primary" onclick="completeSetup()">Finish Setup 🚀</button>
         </div>
     </div>
@@ -359,14 +376,12 @@
     <div id="app-shell">
         <nav class="nav-menu glass">
             <div class="nav-brand" style="display: flex; align-items: center; gap: 10px;">
-                <img src="769175393_28482904897980363_5172773195014769991_n.jpg" alt="Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;">
+                <img src="769175393_28482904897980363_5172773195014769991_n.jpg" alt="Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'">
                 <span class="text-gradient">LumaTrack</span>
             </div>
             <a onclick="nav('dashboard')" id="nav-dashboard" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><span>Dashboard</span></a>
             <a onclick="nav('checkin')" id="nav-checkin" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg><span>Check-In</span></a>
-            <!-- NEW PHOTOS TAB -->
             <a onclick="nav('photos')" id="nav-photos" class="nav-item"><svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/></svg><span>Photos</span></a>
-            
             <a onclick="nav('goals')" id="nav-goals" class="nav-item"><svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg><span>Goals</span></a>
             <a onclick="nav('progress')" id="nav-progress" class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/></svg><span>Analytics</span></a>
             <a onclick="nav('calendar')" id="nav-calendar" class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span>Calendar</span></a>
@@ -483,9 +498,21 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- DASHBOARD PHOTO WIDGET (NEW HORIZONTAL SCROLL) -->
+                    <div class="glass glass-card" style="margin-top: 24px; display: none;" id="dash-photo-widget">
+                        <div class="card-header">
+                            <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/></svg></div>
+                            <h3>Recent Progress Photos</h3>
+                        </div>
+                        <div id="dash-photo-gallery" class="dash-photo-scroll">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
                 </section>
 
-                <!-- VIEW: PROGRESS PHOTOS (NEW FEATURE) -->
+                <!-- VIEW: PROGRESS PHOTOS -->
                 <section id="view-photos" class="view">
                     <header style="margin-bottom: 30px;">
                         <h1 class="text-gradient">Progress Photos</h1>
@@ -502,8 +529,14 @@
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
                                 <label>Upload Image</label>
-                                <input type="file" id="photo-file" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
-                                <button class="btn btn-glass" style="width:100%; border: 1px dashed var(--accent); color: var(--accent); padding: 16px;" onclick="document.getElementById('photo-file').click()">📷 Tap to Camera / Gallery</button>
+                                <!-- Split buttons for Camera vs Gallery -->
+                                <input type="file" id="photo-file-camera" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event)">
+                                <input type="file" id="photo-file-gallery" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                                
+                                <div style="display:flex; gap:10px;">
+                                    <button class="btn btn-glass" style="flex:1; border: 1px dashed var(--accent); color: var(--accent); padding: 12px; font-size:0.9rem;" onclick="document.getElementById('photo-file-camera').click()">📸 Camera</button>
+                                    <button class="btn btn-glass" style="flex:1; border: 1px dashed var(--success); color: var(--success); padding: 12px; font-size:0.9rem;" onclick="document.getElementById('photo-file-gallery').click()">🖼️ Gallery</button>
+                                </div>
                             </div>
                         </div>
                         
@@ -643,6 +676,11 @@
                         <h1 class="text-gradient" id="set-title">Settings</h1>
                     </header>
                     
+                    <!-- ADMIN RESTORE SECTION -->
+                    <div id="admin-restore-section" style="display:none; margin-bottom:24px;">
+                        <button class="btn btn-primary" style="background:var(--danger); box-shadow: 0 5px 15px rgba(244, 63, 94, 0.4);" onclick="restoreAdminSession()">↩ Exit Remote Login & Restore Admin Data</button>
+                    </div>
+
                     <div class="grid grid-2">
                         <!-- PROFILE -->
                         <div class="glass glass-card">
@@ -685,10 +723,10 @@
 
                         <!-- DATA SYNC & FIREBASE 4-DIGIT BACKUP -->
                         <div class="glass glass-card" style="grid-column: 1 / -1;">
-                            <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></div><h3>Firebase Cloud Sync (4-Digit PIN)</h3></div>
+                            <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></div><h3>Firebase Cloud Sync</h3></div>
                             
                             <div style="background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); padding: 20px; border-radius: 16px; margin-top:15px; text-align:center;">
-                                <h3 style="margin-bottom:10px;">Cross-Device Cloud Sync</h3>
+                                <h3 style="margin-bottom:10px;">Cross-Device Sync</h3>
                                 <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Generate a 4-digit PIN to load your data on another device securely.</p>
                                 
                                 <div id="sync-code-display" style="font-size: 2.5rem; letter-spacing: 10px; font-weight: 800; color: var(--accent); margin-bottom: 15px; display:none;">
@@ -712,17 +750,6 @@
                             
                             <button class="btn btn-glass" style="border-color:var(--danger); color:var(--danger); margin-top:30px;" onclick="resetData()">Delete All Data Permanently</button>
                         </div>
-                        
-                        <!-- ADMIN GATEWAY -->
-                        <div class="glass glass-card" style="grid-column: 1 / -1; margin-top:10px;">
-                            <div class="card-header"><div class="card-icon" style="color:#fbbf24;"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg></div><h3 style="color:#fbbf24;">Admin Gateway</h3></div>
-                            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Enter security PIN (2207) to unlock master admin panel.</p>
-                            <div style="display:flex; gap:10px;">
-                                <input type="password" id="admin-secret" placeholder="PIN" style="letter-spacing:5px; text-align:center; font-weight:bold;">
-                                <button class="btn btn-glass" style="width:auto; padding:10px 20px; background:#fbbf24; color:#000;" onclick="checkAdmin()">Unlock</button>
-                            </div>
-                        </div>
-                        
                     </div>
                 </section>
                 
@@ -771,6 +798,22 @@
 
     <!-- SCRIPT LOGIC -->
     <script>
+        // --- SAFE STORAGE UTILS ---
+        function safeGetItem(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+        function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) { console.warn("Storage blocked"); } }
+        function safeRemoveItem(key) { try { localStorage.removeItem(key); } catch(e) {} }
+
+        // --- TOAST NOTIFICATION SYSTEM ---
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            container.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
         // --- FIREBASE CLOUD CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyAQH8ml3T6cH0gOnXM7s8qofFBSV7vTyC8",
@@ -782,11 +825,18 @@
             measurementId: "G-4WNEHQVZ47"
         };
 
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase safely
+        let fdb = null;
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                fdb = firebase.firestore();
+            }
+        } catch (error) {
+            console.warn("Firebase blocked or offline.", error);
         }
-        const fdb = firebase.firestore();
 
         // --- 1. PREMIUM THEMES ---
         const THEMES = {
@@ -799,30 +849,82 @@
             obsidian: { name: 'Obsidian', mode: 'dark', bg1: '#000000', bg2: '#0a0a0a', bg3: '#171717', accent: '#a3a3a3' }
         };
 
-        // --- 2. DB INITIALIZATION ---
+        // --- 2. SAFE DB INITIALIZATION ---
         const DB_KEY = 'lumaTrackData_v10';
-        let db;
-        try { db = JSON.parse(localStorage.getItem(DB_KEY)); } catch(e){}
+        let db = null;
+        let rawDb = safeGetItem(DB_KEY);
+        if (rawDb) { try { db = JSON.parse(rawDb); } catch(e) {} }
         
-        if (!db) {
-            let oldDb = JSON.parse(localStorage.getItem('lumaTrackData_v9')) || JSON.parse(localStorage.getItem('lumaTrackData_v8'));
-            if(oldDb) { db = oldDb; } else { db = { profile: null, settings: {}, entries: {}, goals: [], photos: {} }; }
+        // Recover older versions if v10 is lost due to filename changes
+        if (!db || typeof db !== 'object' || Array.isArray(db)) {
+            let oldDbRaw = safeGetItem('lumaTrackData_v9') || safeGetItem('lumaTrackData_v8') || safeGetItem('lumaTrackData_v7');
+            if (oldDbRaw) { try { db = JSON.parse(oldDbRaw); } catch(e) { db = {}; } } 
+            else { db = {}; }
         }
         
+        // Strict property verification to prevent desktop crashing
+        if (typeof db !== 'object' || db === null || Array.isArray(db)) db = {};
+        if (!db.profile) db.profile = null;
+        if (!db.settings) db.settings = {};
         if (!db.settings.unit) db.settings.unit = 'metric';
         if (!db.settings.appearance) db.settings.appearance = { theme: 'signature', bgStyle: 'mesh', font: "'Inter', sans-serif" };
+        if (!db.entries) db.entries = {};
         if (!db.goals) db.goals = [];
-        if (!db.photos) db.photos = {}; // Initialize photos object
+        if (!db.photos) db.photos = {}; 
+
+        // --- CLOCK AND FULLSCREEN UTILS (MISSING FUNCTIONS FIXED) ---
+        function startLiveClock() {
+            function updateTime() {
+                const now = new Date();
+                const timeEl = document.getElementById('live-time');
+                const dateEl = document.getElementById('live-date');
+                if(timeEl) timeEl.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                if(dateEl) dateEl.textContent = now.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
+            }
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    showToast(`Fullscreen not supported: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initStudio(); applyTheme(); startLiveClock();
-            if (!db.profile) { document.getElementById('view-onboarding').style.display = 'flex'; } 
-            else { startApp(); }
-            document.getElementById('in-weight').addEventListener('input', (e) => animScale(e.target.value));
-            
-            // Set today's date for photo tab by default
-            let d = new Date();
-            document.getElementById('photo-date').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            try {
+                initStudio(); applyTheme(); startLiveClock();
+                
+                if(safeGetItem('lumaAdminBackup')) {
+                    const adminSec = document.getElementById('admin-restore-section');
+                    if(adminSec) adminSec.style.display = 'block';
+                }
+
+                if (!db.profile) { 
+                    const ob = document.getElementById('view-onboarding');
+                    if(ob) ob.style.display = 'block'; 
+                } 
+                else { startApp(); }
+                
+                let weightEl = document.getElementById('in-weight');
+                if(weightEl) weightEl.addEventListener('input', (e) => animScale(e.target.value));
+                
+                let d = new Date();
+                let photoDateEl = document.getElementById('photo-date');
+                if(photoDateEl) photoDateEl.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+            } catch(e) {
+                console.error("Boot Error:", e);
+                const ob = document.getElementById('view-onboarding');
+                if(ob) ob.style.display = 'block';
+                showToast("App recovered from an error.");
+            }
         });
 
         window.addEventListener('resize', () => {
@@ -830,41 +932,69 @@
             if(document.getElementById('view-dashboard').classList.contains('active')) renderTrendSparkline();
         });
 
-        function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+        function saveDB() { safeSetItem(DB_KEY, JSON.stringify(db)); }
 
-        function toggleFullScreen() {
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                let docElm = document.documentElement;
-                if (docElm.requestFullscreen) docElm.requestFullscreen();
-                else if (docElm.webkitRequestFullscreen) docElm.webkitRequestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        // --- GLOBAL SWIPE NAVIGATION (Mobile) ---
+        let touchstartX = 0, touchstartY = 0;
+        document.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+            touchstartY = e.changedTouches[0].screenY;
+        }, {passive: true});
+        
+        document.addEventListener('touchend', e => {
+            let touchendX = e.changedTouches[0].screenX;
+            let touchendY = e.changedTouches[0].screenY;
+            let deltaX = touchendX - touchstartX;
+            let deltaY = touchendY - touchstartY;
+            
+            if(e.target.closest && (e.target.closest('.chart-scroll') || e.target.closest('.photo-gallery') || e.target.closest('.dash-photo-scroll') || e.target.closest('.date-nav-container') || e.target.closest('.nav-menu'))) return;
+            
+            if (Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX < 0) navigateRelative(1); 
+                else navigateRelative(-1); 
             }
-        }
+        }, {passive: true});
 
-        function startLiveClock() {
-            const tEl = document.getElementById('live-time'), dEl = document.getElementById('live-date');
-            setInterval(() => {
-                const now = new Date();
-                tEl.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                dEl.textContent = now.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
-            }, 1000);
+        function navigateRelative(dir) {
+            const tabs = ['dashboard', 'checkin', 'photos', 'goals', 'progress', 'calendar', 'settings'];
+            if(document.getElementById('nav-admin').style.display !== 'none') tabs.push('admin');
+            
+            let current = tabs.find(t => document.getElementById('nav-' + t).classList.contains('active')) || 'dashboard';
+            let idx = tabs.indexOf(current);
+            let nextIdx = idx + dir;
+            
+            if(nextIdx >= 0 && nextIdx < tabs.length) {
+                nav(tabs[nextIdx]);
+                const navEl = document.getElementById('nav-' + tabs[nextIdx]);
+                if(navEl && window.innerWidth <= 768) {
+                    navEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            }
         }
 
         // --- 3. THEME ENGINE ---
         function applyTheme() {
-            const root = document.documentElement.style, app = db.settings.appearance, t = THEMES[app.theme] || THEMES.signature;
+            const root = document.documentElement.style;
+            let appTheme = db.settings && db.settings.appearance ? db.settings.appearance : { theme: 'signature', bgStyle: 'mesh', font: "'Inter', sans-serif" };
+            let t = THEMES[appTheme.theme] || THEMES.signature;
+
             document.body.setAttribute('data-mode', t.mode);
-            root.setProperty('--bg-1', t.bg1); root.setProperty('--bg-2', t.bg2); root.setProperty('--bg-3', t.bg3);
-            root.setProperty('--accent', t.accent); root.setProperty('--font-main', app.font);
+            root.setProperty('--bg-1', t.bg1);
+            root.setProperty('--bg-2', t.bg2);
+            root.setProperty('--bg-3', t.bg3);
+            root.setProperty('--accent', t.accent);
+            root.setProperty('--font-main', appTheme.font);
+
             let hex = t.accent.replace('#','');
             let r = parseInt(hex.substring(0,2), 16), g = parseInt(hex.substring(2,4), 16), b = parseInt(hex.substring(4,6), 16);
             root.setProperty('--accent-glow', `rgba(${r},${g},${b},0.5)`);
 
             document.querySelectorAll('.bg-layer').forEach(el => el.style.opacity = 0);
-            if (app.bgStyle === 'mesh') document.getElementById('bg-mesh').style.opacity = 1;
-            if (app.bgStyle === 'aurora') document.getElementById('bg-aurora').style.opacity = 0.6;
+            const mesh = document.getElementById('bg-mesh');
+            const aurora = document.getElementById('bg-aurora');
+
+            if(mesh && appTheme.bgStyle === 'mesh') mesh.style.opacity = 1;
+            if(aurora && appTheme.bgStyle === 'aurora') aurora.style.opacity = 0.6;
         }
 
         function initStudio() {
@@ -874,9 +1004,13 @@
                 const t = THEMES[key];
                 html += `<div class="theme-card ${db.settings.appearance.theme === key ? 'active' : ''}" style="background: linear-gradient(135deg, ${t.bg1}, ${t.bg3}); color: #fff;" onclick="selectTheme('${key}')">${t.name}</div>`;
             }
-            grid.innerHTML = html; obGrid.innerHTML = html;
-            document.getElementById('set-bg').value = db.settings.appearance.bgStyle;
-            document.getElementById('set-font').value = db.settings.appearance.font;
+            if(grid) grid.innerHTML = html; 
+            if(obGrid) obGrid.innerHTML = html;
+            
+            const bgSelect = document.getElementById('set-bg');
+            if(bgSelect) bgSelect.value = db.settings.appearance.bgStyle;
+            const fontSelect = document.getElementById('set-font');
+            if(fontSelect) fontSelect.value = db.settings.appearance.font;
         }
 
         function selectTheme(key) {
@@ -890,7 +1024,7 @@
         function nextOnboardStep() {
             const name = document.getElementById('setup-name').value.trim();
             const initWeight = parseFloat(document.getElementById('setup-weight').value);
-            if(!name || isNaN(initWeight)) return alert('Please enter a Nickname and Current Weight.');
+            if(!name || isNaN(initWeight)) return showToast('Please enter a Nickname and Current Weight.');
             
             db.profile = { name: name, age: document.getElementById('setup-age').value, height: document.getElementById('setup-height').value, start: new Date().toISOString() };
             db.settings.unit = document.getElementById('setup-unit').value; 
@@ -899,7 +1033,13 @@
             db.entries[todayStr] = { weight: initWeight, energy: 5, mood: 5 };
 
             saveDB();
-            document.getElementById('onboard-step-1').style.display = 'none'; document.getElementById('onboard-step-2').style.display = 'block';
+            
+            let step1 = document.getElementById('onboard-step-1');
+            let step2 = document.getElementById('onboard-step-2');
+            step1.classList.remove('active');
+            step1.style.display = 'none';
+            step2.style.display = 'block';
+            setTimeout(() => step2.classList.add('active'), 10);
         }
 
         function completeSetup() { startApp(); }
@@ -919,15 +1059,18 @@
         // --- 5. NAVIGATION ---
         function nav(viewId) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('nav-' + viewId).classList.add('active');
+            let navBtn = document.getElementById('nav-' + viewId);
+            if(navBtn) navBtn.classList.add('active');
             
             document.querySelectorAll('.view').forEach(el => {
                 el.classList.remove('active');
             });
             
             setTimeout(() => {
-                document.getElementById('view-' + viewId).classList.add('active');
-                document.getElementById('scroll-area').scrollTop = 0;
+                let v = document.getElementById('view-' + viewId);
+                if(v) v.classList.add('active');
+                let scrollArea = document.getElementById('scroll-area');
+                if(scrollArea) scrollArea.scrollTop = 0;
             }, 10);
             
             if (viewId === 'dashboard') { buildDateNav(); renderDash(); }
@@ -960,15 +1103,14 @@
 
         function saveEntry() {
             const w = parseFloat(document.getElementById('in-weight').value), wa = parseFloat(document.getElementById('in-waist').value);
-            if(isNaN(w) && isNaN(wa)) return alert("Enter weight or waist to save.");
+            if(isNaN(w) && isNaN(wa)) return showToast("Enter weight or waist to save.");
             
             const dStr = document.getElementById('in-date').value;
             db.entries[dStr] = { weight: isNaN(w) ? null : w, waist: isNaN(wa) ? null : wa, energy: document.getElementById('in-energy').value, mood: document.getElementById('in-mood').value, notes: document.getElementById('in-notes').value.trim() };
             saveDB();
             
-            const btn = document.getElementById('btn-save'); const oldTxt = btn.textContent;
-            btn.textContent = '✓ Saved Successfully'; btn.style.background = 'var(--success)';
-            setTimeout(() => { btn.textContent = oldTxt; btn.style.background = ''; nav('dashboard'); }, 1000);
+            showToast('✓ Entry Saved Successfully');
+            setTimeout(() => { nav('dashboard'); }, 500);
         }
 
         let scaleAnimId;
@@ -984,20 +1126,19 @@
             scaleAnimId = requestAnimationFrame(step);
         }
 
-        // --- NEW: PROGRESS PHOTOS LOGIC WITH AUTO COMPRESSION ---
+        // --- NEW: PROGRESS PHOTOS LOGIC ---
         let currentPhotoBase64 = null;
 
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Using Canvas to compress image automatically so it doesn't crash LocalStorage/Firebase
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 600; // Cap width to keep size small
+                    const MAX_WIDTH = 600; 
                     const scaleSize = MAX_WIDTH / img.width;
                     
                     canvas.width = MAX_WIDTH;
@@ -1006,11 +1147,10 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // Compress to JPEG 70% quality
                     currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
                     
                     const preview = document.getElementById('photo-preview');
-                    preview.src = currentPhotoBase64;
+                    if(preview) preview.src = currentPhotoBase64;
                     document.getElementById('photo-preview-container').style.display = 'block';
                 }
                 img.src = e.target.result;
@@ -1022,38 +1162,28 @@
             const dStr = document.getElementById('photo-date').value;
             const notes = document.getElementById('photo-notes').value.trim();
             
-            if(!dStr) return alert("Please select a date.");
-            if(!currentPhotoBase64) return alert("Please upload or take a photo first.");
+            if(!dStr) return showToast("Please select a date.");
+            if(!currentPhotoBase64) return showToast("Please upload or take a photo first.");
 
-            // Save to DB
-            db.photos[dStr] = {
-                image: currentPhotoBase64,
-                notes: notes
-            };
+            db.photos[dStr] = { image: currentPhotoBase64, notes: notes };
             saveDB();
 
-            const btn = document.getElementById('btn-save-photo');
-            const oldTxt = btn.textContent;
-            btn.textContent = '✓ Photo Saved!';
-            btn.style.background = 'var(--success)';
+            showToast('✓ Photo Saved!');
             
             setTimeout(() => { 
-                btn.textContent = oldTxt; 
-                btn.style.background = ''; 
-                // Reset form
                 document.getElementById('photo-preview-container').style.display = 'none';
                 currentPhotoBase64 = null;
                 document.getElementById('photo-notes').value = '';
-                
                 renderPhotosGallery();
-            }, 1000);
+            }, 500);
         }
 
         function renderPhotosGallery() {
             const gallery = document.getElementById('photo-gallery');
+            if(!gallery) return;
             gallery.innerHTML = '';
             
-            const dates = Object.keys(db.photos).sort((a,b) => new Date(b) - new Date(a)); // Newest first
+            const dates = Object.keys(db.photos || {}).sort((a,b) => new Date(b) - new Date(a));
 
             if(dates.length === 0) {
                 gallery.innerHTML = `<p style="padding: 20px; color: var(--text-muted);">No photos saved yet. Upload your first progress picture above!</p>`;
@@ -1062,7 +1192,6 @@
 
             dates.forEach(dStr => {
                 const p = db.photos[dStr];
-                // Try to find corresponding weight for that date
                 const weight = db.entries[dStr] && db.entries[dStr].weight ? `${db.entries[dStr].weight} ${db.settings.unit === 'imperial' ? 'lb' : 'kg'}` : '--';
                 
                 gallery.innerHTML += `
@@ -1084,12 +1213,14 @@
                 delete db.photos[dStr];
                 saveDB();
                 renderPhotosGallery();
+                showToast("Photo deleted.");
             }
         }
 
         // --- 6. DASHBOARD & BMI ---
         function buildDateNav() {
-            const navCont = document.getElementById('dash-date-nav'); navCont.innerHTML = ''; let today = new Date();
+            const navCont = document.getElementById('dash-date-nav'); if(!navCont) return;
+            navCont.innerHTML = ''; let today = new Date();
             for(let i=0; i<14; i++) {
                 let d = new Date(today); d.setDate(d.getDate() - i); 
                 let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -1175,6 +1306,27 @@
             } else {
                 bmiDisp.innerHTML = `<p style="color:var(--text-main);">Add height in Settings and log a weight to view your BMI.</p>`;
                 document.getElementById('bmi-disclaimer').style.display = 'none'; document.getElementById('bmi-age-warning').style.display = 'none';
+            }
+
+            // --- POPULATE DASHBOARD PHOTO GALLERY ---
+            const photoWidget = document.getElementById('dash-photo-widget');
+            const dashGallery = document.getElementById('dash-photo-gallery');
+            const photoDates = Object.keys(db.photos || {}).sort((a,b) => new Date(b) - new Date(a));
+            
+            if(photoDates.length > 0) {
+                photoWidget.style.display = 'block';
+                dashGallery.innerHTML = '';
+                photoDates.forEach(dStr => {
+                    const p = db.photos[dStr];
+                    dashGallery.innerHTML += `
+                        <div class="dash-photo-card" onclick="nav('photos')">
+                            <img src="${p.image}" alt="Progress Photo">
+                            <div class="dash-photo-date">${dStr}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                photoWidget.style.display = 'none';
             }
 
             setTimeout(() => renderTrendSparkline(), 50);
@@ -1292,8 +1444,8 @@
             const sW = parseFloat(document.getElementById('new-goal-start').value);
             const tW = parseFloat(document.getElementById('new-goal-target').value);
             
-            if(!name || isNaN(sW) || isNaN(tW)) return alert("Please fill all fields.");
-            if(!goalRangeEnd) return alert("Please click twice on the calendar to set a start and target deadline date.");
+            if(!name || isNaN(sW) || isNaN(tW)) return showToast("Please fill all fields.");
+            if(!goalRangeEnd) return showToast("Please click twice on the calendar to set a start and target deadline date.");
 
             db.goals.forEach(g => g.active = false);
 
@@ -1550,11 +1702,13 @@
             updateUnitsUI(); det.style.display = 'block';
         }
 
-        // --- 12. FIREBASE CLOUD SYNC & ADMIN PANEL ---
+        // --- 12. FIREBASE CLOUD SYNC & HIDDEN ADMIN GATEWAY ---
         async function generateFirebasePin() {
+            if(!fdb) return showToast("Cannot sync: Firebase is blocked or offline.");
+            
             const pin = Math.floor(1000 + Math.random() * 9000).toString();
             const btn = event.target;
-            btn.textContent = "Uploading to Cloud...";
+            btn.textContent = "Uploading...";
 
             try {
                 await fdb.collection("users").doc(pin).set({
@@ -1568,9 +1722,9 @@
                 disp.textContent = pin;
                 disp.style.display = 'block';
                 btn.textContent = "Generate Code";
-                alert(`Success! Your 4-Digit Cloud PIN is: ${pin}\nEnter this number on your other device to sync.`);
+                showToast(`Code generated! Enter ${pin} on your other device.`);
             } catch(e) {
-                alert("Firebase Error: Make sure your database is set to Test Mode.");
+                showToast("Firebase Error: Check database rules/settings.");
                 btn.textContent = "Generate Code";
             }
         }
@@ -1579,50 +1733,49 @@
             const pin = prompt("Enter the 4-Digit Cloud PIN:");
             if(!pin) return;
 
+            // --- SECRET ADMIN GATEWAY UNLOCK (PIN: 2901) ---
+            if(pin === '2901') {
+                document.getElementById('nav-admin').style.display = 'flex';
+                showToast("Master Admin Panel Unlocked.");
+                nav('admin');
+                return;
+            }
+
+            if(!fdb) return showToast("Cannot sync: Firebase is blocked or offline.");
+
             try {
                 const docRef = await fdb.collection("users").doc(pin).get();
                 if(docRef.exists) {
                     const data = docRef.data();
                     db = data.appData;
                     saveDB();
-                    alert("Cloud Sync Successful! Reloading app...");
-                    location.reload();
+                    showToast("Sync Successful! Reloading...");
+                    setTimeout(() => location.reload(), 1000);
                 } else {
-                    alert("PIN not found in Firebase database.");
+                    showToast("PIN not found in Firebase database.");
                 }
             } catch(e) {
-                alert("Connection error. Check your Firebase settings.");
+                showToast("Connection error. Check your Firebase settings.");
             }
         }
 
         function exportSync() {
             const str = btoa(encodeURIComponent(JSON.stringify(db)));
-            if(navigator.clipboard) { navigator.clipboard.writeText(str); alert('Backup code copied!'); }
+            if(navigator.clipboard) { navigator.clipboard.writeText(str); showToast('Backup code copied!'); }
             else prompt("Copy this code:", str);
         }
         function importSync() {
             const code = prompt('Paste your Backup Code here:'); if(!code) return;
             try {
                 const parsed = JSON.parse(decodeURIComponent(atob(code)));
-                if(parsed.profile && parsed.entries) { db = parsed; saveDB(); alert("Imported!"); location.reload(); }
-            } catch(e) { alert('Invalid code.'); }
+                if(parsed.profile && parsed.entries) { db = parsed; saveDB(); showToast("Imported!"); setTimeout(() => location.reload(), 1000); }
+            } catch(e) { showToast('Invalid code.'); }
         }
         function resetData() {
-            if(confirm('WARNING: Delete ALL data permanently?')) { localStorage.clear(); location.reload(); }
+            if(confirm('WARNING: Delete ALL data permanently?')) { safeRemoveItem(DB_KEY); location.reload(); }
         }
 
-        // ADMIN PANEL LOGIC (PIN: 2207)
-        function checkAdmin() {
-            const pin = document.getElementById('admin-secret').value;
-            if(pin === '2207') {
-                document.getElementById('nav-admin').style.display = 'flex';
-                document.getElementById('admin-secret').value = '';
-                nav('admin');
-            } else {
-                alert("Incorrect Admin PIN.");
-            }
-        }
-
+        // ADMIN PANEL LOGIC 
         async function renderAdminPanel() {
             const list = document.getElementById('admin-user-list');
             const countEl = document.getElementById('admin-count');
@@ -1671,13 +1824,27 @@
             try {
                 const docRef = await fdb.collection("users").doc(pin).get();
                 if(docRef.exists) {
+                    // Backup admin database safely before impersonating
+                    safeSetItem('lumaAdminBackup', JSON.stringify(db));
                     db = docRef.data().appData;
                     saveDB();
-                    alert("Switched account successfully!");
-                    location.reload();
+                    showToast("Switched account successfully!");
+                    setTimeout(() => location.reload(), 1000);
                 }
             } catch(e) {
-                alert("Could not load user data.");
+                showToast("Could not load user data.");
+            }
+        }
+
+        // RESTORE ADMIN SESSION LOGIC
+        function restoreAdminSession() {
+            const adminBackup = safeGetItem('lumaAdminBackup');
+            if(adminBackup) {
+                db = JSON.parse(adminBackup);
+                safeRemoveItem('lumaAdminBackup');
+                saveDB();
+                showToast("Admin session restored!");
+                setTimeout(() => location.reload(), 1000);
             }
         }
     </script>
