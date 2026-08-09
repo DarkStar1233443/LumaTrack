@@ -369,7 +369,7 @@
             </div>
             <button class="btn btn-primary" onclick="nextOnboardStep()">Continue ✨</button>
             
-            <!-- NEW DIRECT LOGIN OPTION -->
+            <!-- DIRECT LOGIN OPTION ON SETUP PAGE -->
             <div style="margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--glass-border);">
                 <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;">Already tracking on another device?</p>
                 <button class="btn btn-glass" onclick="enterFirebasePin()">☁️ Login with Cloud PIN</button>
@@ -440,7 +440,7 @@
                             <p style="font-size:1.1rem; color:var(--text-muted); font-weight:500;" id="dash-subtitle">Your Overview</p>
                         </div>
                         
-                        <!-- Top Right Action Controls (Fullscreen removed as requested) -->
+                        <!-- Top Right Action Controls -->
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <div style="text-align: right; background:var(--input-bg); padding:10px 20px; border-radius:16px; border:1px solid var(--glass-border);">
                                 <div id="live-time" style="font-size:1.5rem; font-weight:800; color:var(--accent);">00:00</div>
@@ -564,7 +564,7 @@
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
                                 <label>Upload Image</label>
-                                <!-- Fix: capture="environment" added properly to ensure it opens the camera app -->
+                                <!-- Camera / Gallery inputs -->
                                 <input type="file" id="photo-file-camera" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event)">
                                 <input type="file" id="photo-file-gallery" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
                                 
@@ -761,16 +761,16 @@
                             <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></div><h3>Firebase Cloud Sync</h3></div>
                             
                             <div style="background: rgba(0,0,0,0.05); border: 1px solid var(--glass-border); padding: 20px; border-radius: 16px; margin-top:15px; text-align:center;">
-                                <h3 style="margin-bottom:10px;">Cross-Device Sync</h3>
-                                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Generate a 4-digit PIN to load your data on another device securely.</p>
+                                <h3 style="margin-bottom:10px;">Cross-Device Sync PIN</h3>
+                                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Your personal 4-digit PIN is automatically synced to the cloud.</p>
                                 
-                                <div id="sync-code-display" style="font-size: 2.5rem; letter-spacing: 10px; font-weight: 800; color: var(--accent); margin-bottom: 15px; display:none;">
+                                <div id="sync-code-display" style="font-size: 2.5rem; letter-spacing: 10px; font-weight: 800; color: var(--accent); margin-bottom: 15px;">
                                     ----
                                 </div>
                                 
                                 <div class="grid grid-2" style="gap:10px;">
-                                    <button class="btn btn-primary" onclick="generateFirebasePin()">Generate Code</button>
-                                    <button class="btn btn-glass" onclick="enterFirebasePin()">Enter Code</button>
+                                    <button class="btn btn-primary" onclick="autoSyncToCloud()">Force Sync Now</button>
+                                    <button class="btn btn-glass" onclick="enterFirebasePin()">Switch Account</button>
                                 </div>
                             </div>
 
@@ -836,7 +836,6 @@
         // --- SAFE STORAGE UTILS ---
         function safeGetItem(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
         
-        // FIX: Provide direct warning if storage limits are exceeded (the cause of disappearing photos)
         function safeSetItem(key, val) { 
             try { 
                 localStorage.setItem(key, val); 
@@ -882,11 +881,10 @@
             console.warn("Firebase blocked or offline.", error);
         }
 
-        // --- 1. PREMIUM THEMES (IMPROVED LIGHT MODE COLORS) ---
+        // --- 1. PREMIUM THEMES ---
         const THEMES = {
             signature: { name: 'Luma Premium ✨', mode: 'dark', bg1: '#09090b', bg2: '#18181b', bg3: '#27272a', accent: '#fbbf24' },
             midnight: { name: 'Midnight', mode: 'dark', bg1: '#0f172a', bg2: '#1e1b4b', bg3: '#312e81', accent: '#38bdf8' },
-            // Improved Baby Pink for better contrast as seen in the screenshots
             babypink: { name: 'Baby Pink', mode: 'light', bg1: '#fdf2f8', bg2: '#fce7f3', bg3: '#fbcfe8', accent: '#db2777' },
             pearl: { name: 'Pearl White', mode: 'light', bg1: '#f8fafc', bg2: '#f1f5f9', bg3: '#e2e8f0', accent: '#0ea5e9' },
             lilac: { name: 'Lilac', mode: 'light', bg1: '#FAF5FF', bg2: '#F3E8FF', bg3: '#E9D5FF', accent: '#8b5cf6' },
@@ -900,14 +898,12 @@
         let rawDb = safeGetItem(DB_KEY);
         if (rawDb) { try { db = JSON.parse(rawDb); } catch(e) {} }
         
-        // Recover older versions if v10 is lost due to filename changes
         if (!db || typeof db !== 'object' || Array.isArray(db)) {
             let oldDbRaw = safeGetItem('lumaTrackData_v9') || safeGetItem('lumaTrackData_v8') || safeGetItem('lumaTrackData_v7');
             if (oldDbRaw) { try { db = JSON.parse(oldDbRaw); } catch(e) { db = {}; } } 
             else { db = {}; }
         }
         
-        // Strict property verification to prevent desktop crashing
         if (typeof db !== 'object' || db === null || Array.isArray(db)) db = {};
         if (!db.profile) db.profile = null;
         if (!db.settings) db.settings = {};
@@ -916,8 +912,9 @@
         if (!db.entries) db.entries = {};
         if (!db.goals) db.goals = [];
         if (!db.photos) db.photos = {}; 
+        if (!db.cloudPin) db.cloudPin = null; // Store auto-generated PIN here
 
-        // --- CLOCK UTILS (Fullscreen removed as requested) ---
+        // --- CLOCK UTILS ---
         function startLiveClock() {
             function updateTime() {
                 const now = new Date();
@@ -943,7 +940,15 @@
                     const ob = document.getElementById('view-onboarding');
                     if(ob) ob.style.display = 'block'; 
                 } 
-                else { startApp(); }
+                else { 
+                    startApp(); 
+                    // Ensure cloud pin is generated/synced when opening the app if already logged in
+                    if(!db.cloudPin) {
+                        db.cloudPin = Math.floor(1000 + Math.random() * 9000).toString();
+                        saveDB();
+                    }
+                    autoSyncToCloud(true); // silent background sync
+                }
                 
                 let weightEl = document.getElementById('in-weight');
                 if(weightEl) weightEl.addEventListener('input', (e) => animScale(e.target.value));
@@ -965,11 +970,16 @@
             if(document.getElementById('view-dashboard').classList.contains('active')) renderTrendSparkline();
         });
 
-        function saveDB() { safeSetItem(DB_KEY, JSON.stringify(db)); }
+        function saveDB() { 
+            safeSetItem(DB_KEY, JSON.stringify(db)); 
+            if(db.profile && db.cloudPin) {
+                autoSyncToCloud(true); // Auto sync on every save update
+            }
+        }
 
-        // --- GLOBAL SWIPE NAVIGATION (FIXED: Edge Swipe Only) ---
+        // --- GLOBAL SWIPE NAVIGATION ---
         let touchstartX = 0, touchstartY = 0;
-        const EDGE_THRESHOLD = 30; // Only swipe if started within 30px of screen edges
+        const EDGE_THRESHOLD = 30;
 
         document.addEventListener('touchstart', e => {
             touchstartX = e.changedTouches[0].screenX;
@@ -982,17 +992,15 @@
             let deltaX = touchendX - touchstartX;
             let deltaY = touchendY - touchstartY;
             
-            // Ignore touches starting in the middle of the screen
             let isLeftEdge = touchstartX <= EDGE_THRESHOLD;
             let isRightEdge = touchstartX >= window.innerWidth - EDGE_THRESHOLD;
             if (!isLeftEdge && !isRightEdge) return;
 
-            // Ignore swipes over horizontal scroll containers
             if(e.target.closest && (e.target.closest('.chart-scroll') || e.target.closest('.photo-gallery') || e.target.closest('.dash-photo-scroll') || e.target.closest('.date-nav-container') || e.target.closest('.nav-menu'))) return;
             
             if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
-                if (deltaX < 0 && isRightEdge) navigateRelative(1);  // Swipe left from right edge -> NEXT
-                else if (deltaX > 0 && isLeftEdge) navigateRelative(-1); // Swipe right from left edge -> PREVIOUS
+                if (deltaX < 0 && isRightEdge) navigateRelative(1);  
+                else if (deltaX > 0 && isLeftEdge) navigateRelative(-1); 
             }
         }, {passive: true});
 
@@ -1061,7 +1069,7 @@
         }
         function updateApp(key, val) { db.settings.appearance[key] = val; saveDB(); applyTheme(); }
 
-        // --- 4. ONBOARDING & APP START ---
+        // --- 4. ONBOARDING & APP START (AUTO PIN GENERATION) ---
         function nextOnboardStep() {
             const name = document.getElementById('setup-name').value.trim();
             const initWeight = parseFloat(document.getElementById('setup-weight').value);
@@ -1070,10 +1078,16 @@
             db.profile = { name: name, age: document.getElementById('setup-age').value, height: document.getElementById('setup-height').value, start: new Date().toISOString() };
             db.settings.unit = document.getElementById('setup-unit').value; 
             
+            // AUTOMATICALLY GENERATE A UNIQUE CLOUD PIN FOR NEW ACCOUNT
+            if(!db.cloudPin) {
+                db.cloudPin = Math.floor(1000 + Math.random() * 9000).toString();
+            }
+            
             const todayStr = new Date().toISOString().split('T')[0];
             db.entries[todayStr] = { weight: initWeight, energy: 5, mood: 5 };
 
             saveDB();
+            autoSyncToCloud(true); // Silent background upload to Firebase
             
             let step1 = document.getElementById('onboard-step-1');
             let step2 = document.getElementById('onboard-step-2');
@@ -1095,6 +1109,13 @@
             document.getElementById('set-height').value = db.profile.height || '';
             document.getElementById('checkin-subtitle').textContent = `How are you feeling today, ${db.profile.name}?`;
             document.getElementById('set-title').textContent = `${db.profile.name}'s Settings`;
+            
+            // Populate settings PIN display
+            const disp = document.getElementById('sync-code-display');
+            if(disp && db.cloudPin) {
+                disp.textContent = db.cloudPin;
+                disp.style.display = 'block';
+            }
         }
 
         // --- 5. NAVIGATION ---
@@ -1167,7 +1188,7 @@
             scaleAnimId = requestAnimationFrame(step);
         }
 
-        // --- NEW: PROGRESS PHOTOS LOGIC (FIXED DISAPPEARING ISSUE) ---
+        // --- PROGRESS PHOTOS LOGIC ---
         let currentPhotoBase64 = null;
 
         function handleImageUpload(event) {
@@ -1179,7 +1200,6 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    // FIX: Further compress the image size to prevent local storage limit from being easily exceeded
                     const MAX_WIDTH = 400; 
                     const scaleSize = MAX_WIDTH / img.width;
                     
@@ -1189,7 +1209,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // Further compress the JPEG quality (0.6)
                     currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
                     
                     const preview = document.getElementById('photo-preview');
@@ -1209,7 +1228,7 @@
             if(!currentPhotoBase64) return showToast("Please upload or take a photo first.");
 
             db.photos[dStr] = { image: currentPhotoBase64, notes: notes };
-            saveDB(); // safeSetItem has been updated to alert the user if memory fails here.
+            saveDB();
 
             showToast('✓ Photo Saved!');
             
@@ -1537,7 +1556,7 @@
             document.getElementById('set-unit').value = db.settings.unit;
         }
 
-        // --- 10. SVG LINE CHARTS (ENHANCED WITH GRADIENT INDICATORS) ---
+        // --- 10. SVG LINE CHARTS ---
         let chartRange = 7;
         function setChartRange(days, btn) {
             chartRange = days;
@@ -1597,7 +1616,6 @@
 
             let svg = `<svg width="${w}" height="${h}" style="overflow:visible;">`;
             
-            // Calculate trend color for gradient fill
             let firstV = pts[0].v;
             let lastV = pts[pts.length-1].v;
             let overallTrendColor = 'var(--accent)';
@@ -1647,7 +1665,6 @@
                 prevX = cx; prevY = cy; prevV = p.v;
             });
 
-            // Add Gradient Fill under the line based on the overall trend color
             if (pts.length > 1) {
                 let fillPath = dPath + `L ${prevX},${btmY} L ${padL},${btmY} Z`;
                 let gradientId = `chartGrad_${containerId}`;
@@ -1674,7 +1691,7 @@
             }, 50);
         }
 
-        // --- 11. CALENDAR (RANGE ENGINE & PROGRESS) ---
+        // --- 11. CALENDAR ---
         let calDate = new Date(), calMode = 'single', rangeStart = null, rangeEnd = null;
 
         function toggleCalMode() {
@@ -1773,36 +1790,25 @@
             updateUnitsUI(); det.style.display = 'block';
         }
 
-        // --- 12. FIREBASE CLOUD SYNC & HIDDEN ADMIN GATEWAY ---
-        async function generateFirebasePin() {
-            if(!fdb) return showToast("Cannot sync: Firebase is blocked or offline.");
-            
-            const pin = Math.floor(1000 + Math.random() * 9000).toString();
-            const btn = event.target;
-            btn.textContent = "Uploading...";
-
+        // --- 12. FIREBASE CLOUD SYNC & AUTO SYNC ENGINE ---
+        async function autoSyncToCloud(silent = false) {
+            if(!fdb || !db.cloudPin) return;
             try {
-                await fdb.collection("users").doc(pin).set({
-                    pin: pin,
+                await fdb.collection("users").doc(db.cloudPin).set({
+                    pin: db.cloudPin,
                     name: db.profile ? db.profile.name : "Anonymous",
                     appData: db,
-                    deviceInfo: navigator.userAgent, // Captured for admin panel
+                    deviceInfo: navigator.userAgent,
                     updatedAt: new Date().toISOString()
                 });
-
-                const disp = document.getElementById('sync-code-display');
-                disp.textContent = pin;
-                disp.style.display = 'block';
-                btn.textContent = "Generate Code";
-                showToast(`Code generated! Enter ${pin} on your other device.`);
+                if(!silent) showToast("Synced to cloud successfully!");
             } catch(e) {
-                showToast("Firebase Error: Check database rules/settings.");
-                btn.textContent = "Generate Code";
+                if(!silent) showToast("Cloud sync failed.");
             }
         }
 
         async function enterFirebasePin() {
-            const pin = prompt("Enter the 4-Digit Cloud PIN:");
+            const pin = prompt("Enter your 4-Digit Cloud PIN:");
             if(!pin) return;
 
             // --- SECRET ADMIN GATEWAY UNLOCK (PIN: 2901) ---
@@ -1810,7 +1816,6 @@
                 document.getElementById('nav-admin').style.display = 'flex';
                 showToast("Master Admin Panel Unlocked.");
                 
-                // Hide onboarding if open
                 if(document.getElementById('view-onboarding').style.display !== 'none') {
                     document.getElementById('view-onboarding').style.display = 'none';
                     const shell = document.getElementById('app-shell'); 
@@ -1828,8 +1833,9 @@
                 if(docRef.exists) {
                     const data = docRef.data();
                     db = data.appData;
+                    db.cloudPin = pin; // Ensure PIN maps correctly locally
                     saveDB();
-                    showToast("Sync Successful! Reloading...");
+                    showToast("Account Loaded Successfully! Reloading...");
                     setTimeout(() => location.reload(), 1000);
                 } else {
                     showToast("PIN not found in Firebase database.");
@@ -1866,7 +1872,7 @@
                 countEl.textContent = snapshot.size;
                 
                 if(snapshot.empty) {
-                    list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No cloud accounts found yet. Generate a PIN on a device first!</td></tr>`;
+                    list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No cloud accounts found yet.</td></tr>`;
                     return;
                 }
 
@@ -1884,7 +1890,6 @@
                         }
                     }
 
-                    // Added Action buttons for Info, Login and explicit Deletion
                     html += `
                         <tr>
                             <td style="font-weight:600; color:var(--text-main);">${d.name || 'User'}</td>
@@ -1900,11 +1905,10 @@
                 });
                 list.innerHTML = html;
             } catch(e) {
-                list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--danger);">Failed to load cloud accounts. Make sure you enabled Firestore Database in test mode!</td></tr>`;
+                list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--danger);">Failed to load cloud accounts. Check database rules.</td></tr>`;
             }
         }
 
-        // New helper functions for Admin Actions
         function showDeviceInfo(encodedInfo) {
             alert("Registered Device Info:\n\n" + decodeURIComponent(encodedInfo));
         }
@@ -1914,7 +1918,7 @@
             try {
                 await fdb.collection("users").doc(pin).delete();
                 showToast(`Cloud account [${pin}] deleted successfully.`);
-                renderAdminPanel(); // Refresh list automatically
+                renderAdminPanel(); 
             } catch(e) {
                 showToast("Failed to delete account from cloud.");
             }
@@ -1925,9 +1929,9 @@
             try {
                 const docRef = await fdb.collection("users").doc(pin).get();
                 if(docRef.exists) {
-                    // Backup admin database safely before impersonating
                     safeSetItem('lumaAdminBackup', JSON.stringify(db));
                     db = docRef.data().appData;
+                    db.cloudPin = pin;
                     saveDB();
                     showToast("Switched account successfully!");
                     setTimeout(() => location.reload(), 1000);
@@ -1937,7 +1941,6 @@
             }
         }
 
-        // RESTORE ADMIN SESSION LOGIC
         function restoreAdminSession() {
             const adminBackup = safeGetItem('lumaAdminBackup');
             if(adminBackup) {
