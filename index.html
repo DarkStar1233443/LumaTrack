@@ -167,7 +167,7 @@
         .date-pill.has-data { border-bottom: 3px solid var(--accent); color: var(--text-main); }
         
         /* SCROLLABLE CHART WRAPPER */
-        .chart-layout { display: flex; height: 220px; margin-top: 15px; border-bottom: 1px solid var(--glass-border); }
+        .chart-layout { display: flex; height: 220px; margin-top: 15px; border-bottom: 1px solid var(--glass-border); position: relative; }
         .chart-scroll { flex: 1; overflow-x: auto; overflow-y: hidden; position: relative; -webkit-overflow-scrolling: touch; }
         .chart-scroll::-webkit-scrollbar { height: 6px; }
         .chart-scroll::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
@@ -368,6 +368,12 @@
                 </div>
             </div>
             <button class="btn btn-primary" onclick="nextOnboardStep()">Continue ✨</button>
+            
+            <!-- NEW DIRECT LOGIN OPTION -->
+            <div style="margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--glass-border);">
+                <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;">Already tracking on another device?</p>
+                <button class="btn btn-glass" onclick="enterFirebasePin()">☁️ Login with Cloud PIN</button>
+            </div>
         </div>
         <div class="glass glass-card onboarding-card view" id="onboard-step-2" style="display: none;">
             <h2>Choose Your Vibe</h2>
@@ -558,8 +564,8 @@
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
                                 <label>Upload Image</label>
-                                <!-- Fix: capture="camera" to ensure it opens the camera app -->
-                                <input type="file" id="photo-file-camera" accept="image/*" capture="camera" style="display:none;" onchange="handleImageUpload(event)">
+                                <!-- Fix: capture="environment" added properly to ensure it opens the camera app -->
+                                <input type="file" id="photo-file-camera" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event)">
                                 <input type="file" id="photo-file-gallery" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
                                 
                                 <div style="display:flex; gap:10px;">
@@ -1531,7 +1537,7 @@
             document.getElementById('set-unit').value = db.settings.unit;
         }
 
-        // --- 10. SVG LINE CHARTS ---
+        // --- 10. SVG LINE CHARTS (ENHANCED WITH GRADIENT INDICATORS) ---
         let chartRange = 7;
         function setChartRange(days, btn) {
             chartRange = days;
@@ -1591,6 +1597,16 @@
 
             let svg = `<svg width="${w}" height="${h}" style="overflow:visible;">`;
             
+            // Calculate trend color for gradient fill
+            let firstV = pts[0].v;
+            let lastV = pts[pts.length-1].v;
+            let overallTrendColor = 'var(--accent)';
+            if(metric === 'weight' || metric === 'waist') {
+                overallTrendColor = lastV > firstV ? 'var(--danger)' : lastV < firstV ? 'var(--success)' : 'var(--accent)';
+            } else {
+                overallTrendColor = lastV > firstV ? 'var(--success)' : lastV < firstV ? 'var(--danger)' : 'var(--accent)';
+            }
+            
             let midY = padT + usableH/2;
             let btmY = padT + usableH;
             svg += `<line x1="0" y1="${padT}" x2="${w}" y2="${padT}" stroke="var(--glass-border)" stroke-dasharray="4 4" stroke-width="1"/>`;
@@ -1598,6 +1614,7 @@
             svg += `<line x1="0" y1="${btmY}" x2="${w}" y2="${btmY}" stroke="var(--glass-border)" stroke-dasharray="4 4" stroke-width="1"/>`;
 
             let prevX = null, prevY = null, prevV = null;
+            let dPath = '';
             let lines = '', dots = '', labels = '';
 
             pts.forEach((p, i) => {
@@ -1607,7 +1624,8 @@
                 let cx = padL + (i * ptWidth);
                 let cy = padT + (usableH - (pct * usableH));
 
-                if (i > 0) {
+                if(i === 0) dPath += `M ${cx},${cy} `;
+                else {
                     let color = 'var(--accent)';
                     if(metric === 'weight' || metric === 'waist') {
                         color = p.v > prevV ? 'var(--danger)' : p.v < prevV ? 'var(--success)' : 'var(--accent)'; 
@@ -1616,6 +1634,7 @@
                     }
 
                     let dx = (cx - prevX) * 0.5;
+                    dPath += `C ${prevX+dx},${prevY} ${cx-dx},${cy} ${cx},${cy} `;
                     lines += `<path d="M ${prevX},${prevY} C ${prevX+dx},${prevY} ${cx-dx},${cy} ${cx},${cy}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" filter="drop-shadow(0 3px 4px rgba(0,0,0,0.3))" />`;
                 }
 
@@ -1627,6 +1646,21 @@
 
                 prevX = cx; prevY = cy; prevV = p.v;
             });
+
+            // Add Gradient Fill under the line based on the overall trend color
+            if (pts.length > 1) {
+                let fillPath = dPath + `L ${prevX},${btmY} L ${padL},${btmY} Z`;
+                let gradientId = `chartGrad_${containerId}`;
+                svg += `
+                    <defs>
+                        <linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="${overallTrendColor}" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="${overallTrendColor}" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="${fillPath}" fill="url(#${gradientId})" />
+                `;
+            }
 
             svg += lines + dots + labels + `</svg>`;
             
@@ -1752,6 +1786,7 @@
                     pin: pin,
                     name: db.profile ? db.profile.name : "Anonymous",
                     appData: db,
+                    deviceInfo: navigator.userAgent, // Captured for admin panel
                     updatedAt: new Date().toISOString()
                 });
 
@@ -1774,6 +1809,14 @@
             if(pin === '2901') {
                 document.getElementById('nav-admin').style.display = 'flex';
                 showToast("Master Admin Panel Unlocked.");
+                
+                // Hide onboarding if open
+                if(document.getElementById('view-onboarding').style.display !== 'none') {
+                    document.getElementById('view-onboarding').style.display = 'none';
+                    const shell = document.getElementById('app-shell'); 
+                    shell.style.display = 'flex';
+                    setTimeout(() => { shell.style.opacity = 1; }, 50);
+                }
                 nav('admin');
                 return;
             }
@@ -1841,18 +1884,39 @@
                         }
                     }
 
+                    // Added Action buttons for Info, Login and explicit Deletion
                     html += `
                         <tr>
                             <td style="font-weight:600; color:var(--text-main);">${d.name || 'User'}</td>
                             <td>${latestWeight} ${db.settings.unit==='imperial'?'lb':'kg'}</td>
                             <td><span style="background:var(--input-bg); padding:4px 8px; border-radius:8px; font-family:monospace; color:var(--accent);">${d.pin}</span></td>
-                            <td><button class="btn btn-glass" style="padding:6px 12px; font-size:0.8rem; width:auto;" onclick="loadUserAccount('${doc.id}')">Remote Login</button></td>
+                            <td style="display:flex; gap: 5px;">
+                                <button class="btn btn-glass" style="padding:6px; font-size:0.75rem; width:auto;" title="Device Info" onclick="showDeviceInfo('${encodeURIComponent(d.deviceInfo || 'Unknown Device')}')">ℹ️</button>
+                                <button class="btn btn-glass" style="padding:6px 12px; font-size:0.75rem; width:auto;" onclick="loadUserAccount('${doc.id}')">💻 Login</button>
+                                <button class="btn btn-glass" style="padding:6px; font-size:0.75rem; width:auto; border-color:var(--danger); color:var(--danger);" title="Delete permanently from Cloud" onclick="deleteCloudAccount('${doc.id}')">🗑️</button>
+                            </td>
                         </tr>
                     `;
                 });
                 list.innerHTML = html;
             } catch(e) {
                 list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--danger);">Failed to load cloud accounts. Make sure you enabled Firestore Database in test mode!</td></tr>`;
+            }
+        }
+
+        // New helper functions for Admin Actions
+        function showDeviceInfo(encodedInfo) {
+            alert("Registered Device Info:\n\n" + decodeURIComponent(encodedInfo));
+        }
+
+        async function deleteCloudAccount(pin) {
+            if(!confirm(`WARNING: Are you absolutely sure you want to permanently delete account [${pin}] from the cloud database?`)) return;
+            try {
+                await fdb.collection("users").doc(pin).delete();
+                showToast(`Cloud account [${pin}] deleted successfully.`);
+                renderAdminPanel(); // Refresh list automatically
+            } catch(e) {
+                showToast("Failed to delete account from cloud.");
             }
         }
 
