@@ -110,9 +110,9 @@
         .form-group { margin-bottom: 20px; width: 100%; max-width: 100%; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-main); }
         
-        input:not([type="range"]), select, textarea { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 16px; border-radius: var(--radius-btn); background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); font-family: inherit; font-size: 1rem; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); appearance: none; -webkit-appearance: none; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-        body[data-mode="light"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0); }
+        input:not([type="range"]):not([type="checkbox"]), select, textarea { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; padding: 16px; border-radius: var(--radius-btn); background: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); font-family: inherit; font-size: 1rem; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); appearance: none; -webkit-appearance: none; }
+        input[type="date"]::-webkit-calendar-picker-indicator, input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        body[data-mode="light"] input[type="date"]::-webkit-calendar-picker-indicator, body[data-mode="light"] input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0); }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); transform: translateY(-2px); background: var(--bg-1); }
         body[data-mode="light"] input:focus, body[data-mode="light"] select:focus, body[data-mode="light"] textarea:focus { background: #fff; }
         
@@ -254,10 +254,9 @@
                 border-right: 1px solid var(--glass-border); 
                 background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); 
                 z-index: 50; 
-                overflow-y: auto; /* Made scrollable for desktop */
+                overflow-y: auto; 
                 overflow-x: hidden;
             }
-            /* Custom Scrollbar for Nav Menu */
             .nav-menu::-webkit-scrollbar { width: 6px; }
             .nav-menu::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
             
@@ -265,21 +264,17 @@
             .nav-item { padding: 14px 20px; margin-bottom: 10px; border-radius: 14px; font-size: 1.05rem; }
             .nav-item:hover { transform: translateX(8px); }
             
-            /* Center the main content perfectly on desktop */
             .scroll-container { 
                 margin-left: 280px; flex: 1; height: 100vh; 
                 overflow-y: auto; overflow-x: hidden; 
                 display: flex; flex-direction: column; align-items: center; 
             }
-            /* Custom desktop scrollbar */
             .scroll-container::-webkit-scrollbar { width: 10px; }
             .scroll-container::-webkit-scrollbar-track { background: transparent; }
             .scroll-container::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
             
-            /* Constrain width to look professional, not stretched */
             .main-content { max-width: 1050px; padding: 50px; width: 100%; margin: 0 auto; }
-            
-            .glass-card { padding: 30px; } /* Slightly larger padding for desktop */
+            .glass-card { padding: 30px; }
             .photo-card { flex: 0 0 40%; }
         }
         
@@ -756,6 +751,26 @@
                             </div>
                         </div>
 
+                        <!-- REMINDERS & NOTIFICATIONS -->
+                        <div class="glass glass-card">
+                            <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.6v5.9z"/></svg></div><h3>Reminders & Notifications</h3></div>
+                            <div class="form-group" style="margin-top:10px;">
+                                <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                                    Enable Daily Check-in Reminder
+                                    <input type="checkbox" id="set-reminder-enabled" onchange="updateReminderSetting()" style="width:22px; height:22px; cursor:pointer;">
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>Reminder Time</label>
+                                <input type="time" id="set-reminder-time" value="20:00" onchange="updateReminderSetting()">
+                            </div>
+                            <div class="form-group">
+                                <label>Custom Reminder Message</label>
+                                <input type="text" id="set-reminder-msg" value="Time for your daily LumaTrack check-in! 🔥" onchange="updateReminderSetting()">
+                            </div>
+                            <button class="btn btn-glass" onclick="requestNotifPermission()">🔔 Enable Browser Push Notifications</button>
+                        </div>
+
                         <!-- DATA SYNC & FIREBASE 4-DIGIT BACKUP -->
                         <div class="glass glass-card" style="grid-column: 1 / -1;">
                             <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></div><h3>Firebase Cloud Sync</h3></div>
@@ -792,7 +807,7 @@
                 <section id="view-admin" class="view">
                     <header style="margin-bottom: 30px;">
                         <h1 style="color:#fbbf24; background:none; -webkit-text-fill-color:unset;">Master Admin Panel</h1>
-                        <p style="color:var(--text-muted);">Manage all cloud user accounts via Firebase.</p>
+                        <p style="color:var(--text-muted);">Manage cloud user accounts & send custom notifications.</p>
                     </header>
                     
                     <div class="grid grid-3" style="margin-bottom:24px;">
@@ -804,6 +819,15 @@
                             <p style="font-size:0.8rem; color:var(--text-muted); font-weight:bold; text-transform:uppercase;">System Status</p>
                             <div class="stat-val" style="color:#10b981; font-size:1.5rem;">Connected</div>
                         </div>
+                    </div>
+
+                    <!-- ADMIN NOTIFICATION BROADCAST CARD -->
+                    <div class="glass glass-card" style="margin-bottom:24px; border-color:#fbbf24;">
+                        <h3 style="margin-bottom:15px; color:#fbbf24;">📢 Send Custom Notification</h3>
+                        <div class="form-group"><label>Target User PIN (Leave blank or type ALL to broadcast to everyone)</label><input type="text" id="admin-target-pin" placeholder="e.g. 4821 or ALL"></div>
+                        <div class="form-group"><label>Notification Title</label><input type="text" id="admin-notif-title" placeholder="E.g. Weekly Challenge 🎉"></div>
+                        <div class="form-group"><label>Notification Message</label><textarea id="admin-notif-msg" rows="3" placeholder="Type your custom notification message here..."></textarea></div>
+                        <button class="btn btn-primary" style="background:#fbbf24; color:#000; font-weight:bold;" onclick="sendAdminNotification()">Send Notification 🚀</button>
                     </div>
 
                     <div class="glass glass-card" style="overflow-x:auto;">
@@ -909,10 +933,12 @@
         if (!db.settings) db.settings = {};
         if (!db.settings.unit) db.settings.unit = 'metric';
         if (!db.settings.appearance) db.settings.appearance = { theme: 'signature', bgStyle: 'mesh', font: "'Inter', sans-serif" };
+        if (!db.settings.reminders) db.settings.reminders = { enabled: false, time: "20:00", message: "Time for your daily LumaTrack check-in! 🔥", lastTriggered: null };
         if (!db.entries) db.entries = {};
         if (!db.goals) db.goals = [];
         if (!db.photos) db.photos = {}; 
-        if (!db.cloudPin) db.cloudPin = null; // Store auto-generated PIN here
+        if (!db.cloudPin) db.cloudPin = null;
+        if (!db.notifications) db.notifications = [];
 
         // --- CLOCK UTILS ---
         function startLiveClock() {
@@ -929,7 +955,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             try {
-                initStudio(); applyTheme(); startLiveClock();
+                initStudio(); applyTheme(); startLiveClock(); initReminders();
                 
                 if(safeGetItem('lumaAdminBackup')) {
                     const adminSec = document.getElementById('admin-restore-section');
@@ -942,12 +968,11 @@
                 } 
                 else { 
                     startApp(); 
-                    // Ensure cloud pin is generated/synced when opening the app if already logged in
                     if(!db.cloudPin) {
                         db.cloudPin = Math.floor(1000 + Math.random() * 9000).toString();
                         saveDB();
                     }
-                    autoSyncToCloud(true); // silent background sync
+                    autoSyncToCloud(true);
                 }
                 
                 let weightEl = document.getElementById('in-weight');
@@ -973,7 +998,7 @@
         function saveDB() { 
             safeSetItem(DB_KEY, JSON.stringify(db)); 
             if(db.profile && db.cloudPin) {
-                autoSyncToCloud(true); // Auto sync on every save update
+                autoSyncToCloud(true);
             }
         }
 
@@ -1069,7 +1094,64 @@
         }
         function updateApp(key, val) { db.settings.appearance[key] = val; saveDB(); applyTheme(); }
 
-        // --- 4. ONBOARDING & APP START (AUTO PIN GENERATION) ---
+        // --- REMINDERS & NOTIFICATIONS SYSTEM ---
+        function requestNotifPermission() {
+            if (!('Notification' in window)) {
+                showToast("Browser notifications are not supported by this browser.");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    showToast("Browser notifications enabled successfully!");
+                } else {
+                    showToast("Notification permission denied.");
+                }
+            });
+        }
+
+        function updateReminderSetting() {
+            db.settings.reminders.enabled = document.getElementById('set-reminder-enabled').checked;
+            db.settings.reminders.time = document.getElementById('set-reminder-time').value;
+            db.settings.reminders.message = document.getElementById('set-reminder-msg').value;
+            saveDB();
+            showToast("Reminder settings saved!");
+        }
+
+        function initReminders() {
+            // Check every 30 seconds for reminder trigger
+            setInterval(() => {
+                if (!db.settings || !db.settings.reminders || !db.settings.reminders.enabled) return;
+                const now = new Date();
+                const currentTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                
+                if (currentTime === db.settings.reminders.time) {
+                    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+                    if (db.settings.reminders.lastTriggered === todayStr) return;
+                    
+                    db.settings.reminders.lastTriggered = todayStr;
+                    saveDB();
+
+                    const msg = db.settings.reminders.message;
+                    showToast(msg);
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification("LumaTrack Reminder ⏰", { body: msg, icon: "769175393_28482904897980363_5172773195014769991_n.jpg" });
+                    }
+                }
+            }, 30000);
+        }
+
+        function checkIncomingNotifications() {
+            if (!db.notifications || db.notifications.length === 0) return;
+            db.notifications.forEach(n => {
+                if (!n.read) {
+                    showToast(`📢 ${n.title}: ${n.message}`);
+                    n.read = true;
+                }
+            });
+            saveDB();
+        }
+
+        // --- 4. ONBOARDING & APP START ---
         function nextOnboardStep() {
             const name = document.getElementById('setup-name').value.trim();
             const initWeight = parseFloat(document.getElementById('setup-weight').value);
@@ -1078,7 +1160,6 @@
             db.profile = { name: name, age: document.getElementById('setup-age').value, height: document.getElementById('setup-height').value, start: new Date().toISOString() };
             db.settings.unit = document.getElementById('setup-unit').value; 
             
-            // AUTOMATICALLY GENERATE A UNIQUE CLOUD PIN FOR NEW ACCOUNT
             if(!db.cloudPin) {
                 db.cloudPin = Math.floor(1000 + Math.random() * 9000).toString();
             }
@@ -1087,7 +1168,7 @@
             db.entries[todayStr] = { weight: initWeight, energy: 5, mood: 5 };
 
             saveDB();
-            autoSyncToCloud(true); // Silent background upload to Firebase
+            autoSyncToCloud(true);
             
             let step1 = document.getElementById('onboard-step-1');
             let step2 = document.getElementById('onboard-step-2');
@@ -1110,12 +1191,20 @@
             document.getElementById('checkin-subtitle').textContent = `How are you feeling today, ${db.profile.name}?`;
             document.getElementById('set-title').textContent = `${db.profile.name}'s Settings`;
             
-            // Populate settings PIN display
+            // Populate reminder settings fields
+            if (db.settings.reminders) {
+                document.getElementById('set-reminder-enabled').checked = !!db.settings.reminders.enabled;
+                document.getElementById('set-reminder-time').value = db.settings.reminders.time || "20:00";
+                document.getElementById('set-reminder-msg').value = db.settings.reminders.message || "Time for your daily LumaTrack check-in! 🔥";
+            }
+            
             const disp = document.getElementById('sync-code-display');
             if(disp && db.cloudPin) {
                 disp.textContent = db.cloudPin;
                 disp.style.display = 'block';
             }
+
+            checkIncomingNotifications();
         }
 
         // --- 5. NAVIGATION ---
@@ -1370,7 +1459,6 @@
                 document.getElementById('bmi-disclaimer').style.display = 'none'; document.getElementById('bmi-age-warning').style.display = 'none';
             }
 
-            // --- POPULATE DASHBOARD PHOTO GALLERY ---
             const photoWidget = document.getElementById('dash-photo-widget');
             const dashGallery = document.getElementById('dash-photo-gallery');
             const photoDates = Object.keys(db.photos || {}).sort((a,b) => new Date(b) - new Date(a));
@@ -1800,7 +1888,7 @@
                     appData: db,
                     deviceInfo: navigator.userAgent,
                     updatedAt: new Date().toISOString()
-                });
+                }, { merge: true });
                 if(!silent) showToast("Synced to cloud successfully!");
             } catch(e) {
                 if(!silent) showToast("Cloud sync failed.");
@@ -1833,7 +1921,7 @@
                 if(docRef.exists) {
                     const data = docRef.data();
                     db = data.appData;
-                    db.cloudPin = pin; // Ensure PIN maps correctly locally
+                    db.cloudPin = pin;
                     saveDB();
                     showToast("Account Loaded Successfully! Reloading...");
                     setTimeout(() => location.reload(), 1000);
@@ -1861,7 +1949,7 @@
             if(confirm('WARNING: Delete ALL data permanently?')) { safeRemoveItem(DB_KEY); location.reload(); }
         }
 
-        // ADMIN PANEL LOGIC 
+        // ADMIN PANEL & NOTIFICATION BROADCAST LOGIC 
         async function renderAdminPanel() {
             const list = document.getElementById('admin-user-list');
             const countEl = document.getElementById('admin-count');
@@ -1906,6 +1994,57 @@
                 list.innerHTML = html;
             } catch(e) {
                 list.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--danger);">Failed to load cloud accounts. Check database rules.</td></tr>`;
+            }
+        }
+
+        async function sendAdminNotification() {
+            const targetPin = document.getElementById('admin-target-pin').value.trim();
+            const title = document.getElementById('admin-notif-title').value.trim();
+            const message = document.getElementById('admin-notif-msg').value.trim();
+
+            if (!title || !message) return showToast("Please enter both a notification title and message.");
+            if (!fdb) return showToast("Firebase is not connected.");
+
+            const notifObj = {
+                id: Date.now().toString(),
+                title: title,
+                message: message,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+
+            try {
+                if (targetPin === "" || targetPin.toUpperCase() === "ALL") {
+                    const snapshot = await fdb.collection("users").get();
+                    const batch = fdb.batch();
+                    snapshot.forEach(doc => {
+                        const userData = doc.data();
+                        let appData = userData.appData || {};
+                        if (!appData.notifications) appData.notifications = [];
+                        appData.notifications.push(notifObj);
+                        batch.update(doc.ref, { appData: appData });
+                    });
+                    await batch.commit();
+                    showToast("Notification broadcasted to ALL users! 🚀");
+                } else {
+                    const docRef = fdb.collection("users").doc(targetPin);
+                    const docSnap = await docRef.get();
+                    if (!docSnap.exists) {
+                        return showToast(`User PIN [${targetPin}] not found.`);
+                    }
+                    const userData = docSnap.data();
+                    let appData = userData.appData || {};
+                    if (!appData.notifications) appData.notifications = [];
+                    appData.notifications.push(notifObj);
+                    await docRef.update({ appData: appData });
+                    showToast(`Notification sent to PIN [${targetPin}]! 🚀`);
+                }
+                document.getElementById('admin-notif-title').value = '';
+                document.getElementById('admin-notif-msg').value = '';
+                document.getElementById('admin-target-pin').value = '';
+            } catch (e) {
+                console.error(e);
+                showToast("Failed to send notification.");
             }
         }
 
